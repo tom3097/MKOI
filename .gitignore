@@ -1,2 +1,5 @@
 MKOI/obj/*
 MKOI/bin/*
+.vs/*
+packages/**/*
+!packages/repositories.config

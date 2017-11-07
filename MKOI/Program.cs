@@ -9,6 +9,15 @@ namespace MKOI
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("RC4:");
+            ShowRC4();
+            Console.WriteLine();
+            Console.WriteLine("ChaCha20:");
+            ShowChaCha20();
+        }
+
+        static void ShowRC4()
+        {
             /* See https://en.wikipedia.org/wiki/RC4, Description -> Test vectors section */
 
             /* test case 1 */
@@ -108,7 +117,86 @@ namespace MKOI
                 Console.Write((char)outoutBuffer[i]);
             }
             Console.WriteLine();
+        }
 
+        static void ShowChaCha20()
+        {
+            /* test case 1 */
+            var key = CreateString(32);
+            Console.WriteLine("256 bit key: {0}", key);
+            var nonce = CreateString(8);
+            Console.WriteLine("64 bit nonce (initialisation vector): {0}", nonce);
+
+            var text = "Plaintext";
+            Console.WriteLine("Text before encryption: {0}", text);
+
+            var keyInBytes = Encoding.UTF8.GetBytes(key);
+            var nonceInBytes = Encoding.UTF8.GetBytes(nonce);
+            var textInBytes = Encoding.UTF8.GetBytes(text);
+
+            var encrypted = ChaChaCipherEngine.EncryptionDecryption(textInBytes, keyInBytes, nonceInBytes);
+
+            Console.Write("Text after encryption: ");
+            foreach (var e in encrypted)
+            {
+                Console.Write(e.ToString("X2"));
+            }
+            Console.WriteLine();
+
+            var decrypted = ChaChaCipherEngine.EncryptionDecryption(
+                encrypted,
+                keyInBytes,
+                nonceInBytes);
+            Console.Write("Text after decryption: ");
+            foreach (var d in decrypted)
+            {
+                Console.Write((char)d);
+            }
+            Console.WriteLine();
+            
+            // Mixing custom implementation and BouncyCastle
+
+            var chachaBouncy = new ChaChaEngine();
+
+            // Initialize for encryption
+            chachaBouncy.Init(true, new ParametersWithIV(
+                new KeyParameter(keyInBytes),
+                nonceInBytes));
+
+            byte[] outBuffer = new byte[textInBytes.Length];
+            chachaBouncy.ProcessBytes(textInBytes, 0, textInBytes.Length, outBuffer, 0);
+
+            Console.WriteLine("Text encrypted with BouncyCastle:");
+            for (int i = 0; i < outBuffer.Length; ++i)
+            {
+                Console.Write(outBuffer[i].ToString("X2"));
+            }
+            Console.WriteLine();
+
+            decrypted = ChaChaCipherEngine.EncryptionDecryption(outBuffer, keyInBytes, nonceInBytes);
+            Console.Write("Text decrypted with custom implementation:");
+            foreach (var d in decrypted)
+            {
+                Console.Write((char)d);
+            }
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Source: https://stackoverflow.com/a/4616745/5459240
+        /// </summary>
+        private static string CreateString(int stringLength)
+        {
+            Random rd = new Random();
+            const string allowedChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789!@$?_-";
+            char[] chars = new char[stringLength];
+
+            for (int i = 0; i < stringLength; i++)
+            {
+                chars[i] = allowedChars[rd.Next(0, allowedChars.Length)];
+            }
+
+            return new string(chars);
         }
     }
 }
