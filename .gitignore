@@ -1,0 +1,9 @@
+MKOI_base/MKOI/obj/*
+MKOI_base/MKOI/bin/*
+MKOI_base/.vs/*
+MKOI_base/packages/**/*
+!packages/repositories.config
+CipherStream/CipherStream/obj/*
+CipherStream/CipherStream/bin/*
+CipherStream/.vs/*
+CipherStream/packages/*
