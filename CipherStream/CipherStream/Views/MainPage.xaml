@@ -5,43 +5,42 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:CipherStream.Views"
       mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="400"
+      d:DesignHeight="350" d:DesignWidth="600"
       Title="Stream Cipher"
       Background="#F8F8F8"
       DataContext="{Binding Source={x:Static Application.Current}, Path=AppCipherStreamViewModel}">
 
     <StackPanel HorizontalAlignment="Center">
-        <Label Content="MKOI: Implementacja i porownanie szyfrow strumieniowych"
+        <Label Content="MKOI"
                VerticalAlignment="Center"
                HorizontalAlignment="Center"
-               Margin="0,10,0,0" />
+               Margin="0,10,0,0"
+               FontSize="40"/>
+        <Label Content="Implementacja i porownanie szyfrow strumieniowych"
+               VerticalAlignment="Center"
+               HorizontalAlignment="Center"
+               Margin="0,10,0,0"
+               FontSize="22"/>
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
-            <StackPanel VerticalAlignment="Center"
-                        HorizontalAlignment="Center">
 
-                <Button Width="80"
-                        Height="40"
+                <Button Width="180"
+                        Height="120"
                         Content="RC4"
                         Command="{Binding NavigateToCommand}"
                         CommandParameter="{x:Type local:RC4Page}"
-                        Margin="10,0,0,10" />
+                        Margin="25" />
 
-                <Button Width="80"
-                        Height="40"
+                <Button Width="180"
+                        Height="120"
                         Content="ChaCha20"
                         Command="{Binding NavigateToCommand}"
                         CommandParameter="{x:Type local:ChaCha20Page}"
-                        Margin="10,10,0,0" />
+                        Margin="25" />
 
             </StackPanel>
 
-            <Image Source="pack://application:,,,/CipherStream;component/res/cipher.png"
-                   Width="200"
-                   Margin="20,20,0,20"
-                   HorizontalAlignment="Right" />
 
-        </StackPanel>
     </StackPanel>
 </Page>

@@ -5,36 +5,101 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:CipherStream.Views"
       mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="300"
+      d:DesignHeight="350" d:DesignWidth="600"
       Title="RC4Page"
       Background="White"
       DataContext="{Binding Source={x:Static Application.Current}, Path=AppCipherStreamViewModel}">
 
     <StackPanel>
-        
-        <Label Content="RC4 Page" />
-        
-        <Button Width="80"
-                Height="50"
-                Content="Back"
-                Command="{Binding NavigateBackCommand}" />
+        <Label Content="Algorytm RC4"
+               HorizontalAlignment="Center" />
 
-        <Button Width="80"
-                Height="50"
-                Content="Process"
-                Command="{Binding ProcessRC4Command}" />
-        <Label Height="30" Content="{Binding BouncyCastleOutput}" />
-        <Label Height="30" Content="{Binding CustomOutput}" />
-        <TextBox Height="30" Text="{Binding CipherKey, Mode=OneWayToSource}" />
+        <Grid Margin="0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <TextBox Height="30" Text="{Binding CipherMessage, Mode=OneWayToSource}" />
+            <Label Content="Key:      "
+                   HorizontalAlignment="Left"
+                   Grid.Column="0"
+                   Margin="10,0,0,0"
+                   VerticalAlignment="Center" />
 
-        <Button Width="80"
-                Height="20"
-                Content="Clear"
-                Command="{Binding ClearCommand}" />
+            <TextBox Grid.Column="1"
+                     VerticalAlignment="Center"
+                     />
 
+            <StackPanel Grid.Column="2"
+                        Margin="0,0,10,0"
+                        VerticalAlignment="Center">
+                <RadioButton GroupName="InputType" Content="Char" IsChecked="True" />
+                <RadioButton GroupName="InputType" Content="Hex" />
+            </StackPanel>
+        </Grid>
 
+        <Grid Margin="0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Text:     "
+                   HorizontalAlignment="Left"
+                   Grid.Column="0"
+                   Margin="10,0,0,0"
+                   VerticalAlignment="Center"  />
+
+            <TextBox Grid.Column="1"
+                     VerticalAlignment="Center" />
+
+            <StackPanel Grid.Column="2"
+                        Margin="0,0,10,0"
+                        VerticalAlignment="Center">
+                <RadioButton GroupName="InputType" Content="Char" IsChecked="True" />
+                <RadioButton GroupName="InputType" Content="Hex" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Margin="0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Bouncy castle: "
+                   HorizontalAlignment="Left"
+                   Grid.Column="0"
+                   Margin="10,0,0,0"
+                   VerticalAlignment="Center" />
+
+            <Label Content=""
+                   HorizontalAlignment="Center"
+                   Grid.Column="1"
+                   Margin="10,0,0,0"
+                   VerticalAlignment="Center" />
+        </Grid>
+
+        <Grid Margin="0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Custom impl.: "
+                   HorizontalAlignment="Left"
+                   Grid.Column="0"
+                   Margin="10,0,0,0"
+                   VerticalAlignment="Center" />
+
+            <Label Content=""
+                   HorizontalAlignment="Center"
+                   Grid.Column="1"
+                   Margin="10,0,0,0"
+                   VerticalAlignment="Center" />
+        </Grid>
 
     </StackPanel>
 </Page>
