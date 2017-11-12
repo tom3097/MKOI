@@ -49,6 +49,10 @@ namespace CipherStream.Models
             _canExecute = canExecute;
         }
 
+        public RelayCommand()
+        {
+        }
+
         /// <summary>
         /// Checks whether the command could be executed.
         /// </summary>

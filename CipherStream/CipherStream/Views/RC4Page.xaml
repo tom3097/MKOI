@@ -18,6 +18,23 @@
                 Height="50"
                 Content="Back"
                 Command="{Binding NavigateBackCommand}" />
-        
+
+        <Button Width="80"
+                Height="50"
+                Content="Process"
+                Command="{Binding ProcessRC4Command}" />
+        <Label Height="30" Content="{Binding BouncyCastleOutput}" />
+        <Label Height="30" Content="{Binding CustomOutput}" />
+        <TextBox Height="30" Text="{Binding CipherKey, Mode=OneWayToSource}" />
+
+        <TextBox Height="30" Text="{Binding CipherMessage, Mode=OneWayToSource}" />
+
+        <Button Width="80"
+                Height="20"
+                Content="Clear"
+                Command="{Binding ClearCommand}" />
+
+
+
     </StackPanel>
 </Page>

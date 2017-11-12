@@ -18,6 +18,16 @@
                 Height="50"
                 Content="Back"
                 Command="{Binding NavigateBackCommand}" />
-        
+
+        <Button Width="80"
+                Height="50"
+                Content="Process"
+                Command="{Binding ProcessChaCha20Command}" />
+        <Label Height="40" Content="{Binding BouncyCastleOutput}" />
+        <Label Height="40" Content="{Binding CustomOutput}" />
+        <TextBox Height="40" Text="{Binding CipherKey, Mode=OneWayToSource}" />
+
+        <TextBox Height="40" Text="{Binding CipherMessage, Mode=OneWayToSource}" />
+
     </StackPanel>
 </Page>
