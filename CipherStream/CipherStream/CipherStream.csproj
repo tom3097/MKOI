@@ -75,6 +75,7 @@
     <Compile Include="Models\RC4CipherEngine.cs" />
     <Compile Include="Navigation\PageNavigation.cs" />
     <Compile Include="Models\RelayCommand.cs" />
+    <Compile Include="Validators\NotEmptyValidator.cs" />
     <Compile Include="ViewModels\CipherStreamViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Views\ChaCha20Page.xaml.cs">

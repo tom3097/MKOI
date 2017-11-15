@@ -4,8 +4,9 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:CipherStream.Views"
+      xmlns:validators="clr-namespace:CipherStream.Validators"
       mc:Ignorable="d"
-      d:DesignHeight="400" d:DesignWidth="600"
+      d:DesignHeight="570" d:DesignWidth="600"
       Title="RC4Page"
       Background="White"
       DataContext="{Binding Source={x:Static Application.Current}, Path=AppCipherStreamViewModel}">
@@ -15,7 +16,7 @@
         <Label Content="RC4 Algorithm"
                HorizontalAlignment="Center" />
 
-        <Grid Margin="0,10">
+        <Grid Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -30,7 +31,18 @@
 
             <TextBox Grid.Column="1"
                      VerticalAlignment="Center"
-                     Text="{Binding CipherKey, Mode=OneWayToSource}" />
+                     x:Name="KeyField">
+                <TextBox.Text>
+                    <Binding Path="CipherKey"
+                             Mode="OneWayToSource"
+                             ValidatesOnDataErrors="True"
+                             UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validators:NotEmptyValidator ValidationStep="RawProposedValue" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <CheckBox Grid.Column="2"
                       Content="As Hex"
@@ -38,8 +50,12 @@
                       VerticalAlignment="Center"
                       IsChecked="{Binding KeyAsHex, Mode=TwoWay}" />
         </Grid>
+        <TextBlock Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=KeyField}"
+                   HorizontalAlignment="Center" />
 
-        <Grid Margin="0,10">
+        <Separator/>
+
+        <Grid Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -54,7 +70,18 @@
 
             <TextBox Grid.Column="1"
                      VerticalAlignment="Center"
-                     Text="{Binding CipherMessage, Mode=OneWayToSource}" />
+                     x:Name="TextField">
+                <TextBox.Text>
+                    <Binding Path="CipherMessage"
+                             Mode="OneWayToSource"
+                             ValidatesOnDataErrors="True"
+                             UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validators:NotEmptyValidator ValidationStep="RawProposedValue" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
 
             <CheckBox Grid.Column="2"
                       Content="As Hex"
@@ -63,8 +90,10 @@
                       IsChecked="{Binding TextAsHex, Mode=TwoWay}" />
 
         </Grid>
+        <TextBlock Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=TextField}"
+                   HorizontalAlignment="Center" />
 
-        <Grid Margin="0,10">
+        <Grid Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -89,7 +118,7 @@
                       IsChecked="{Binding BouncyCastleOutputAsHex, Mode=TwoWay}" />
         </Grid>
 
-        <Grid Margin="0,10">
+        <Grid Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -109,16 +138,143 @@
 
             <CheckBox Grid.Column="2"
                       Content="As Hex"
-                      Margin="10,5"
+                      Margin="10, 5"
                       VerticalAlignment="Center"
                       IsChecked="{Binding CustomOutputAsHex, Mode=TwoWay}" />
         </Grid>
 
-        <Button Content="Process RC4"
+        <Button Content="Process to GUI"
                 Width="150"
                 HorizontalAlignment="Left"
-                Command="{Binding ProcessRC4Command}"
-                Margin="15" />
+                Command="{Binding ProcessRC4GUICommand}"
+                Margin="15">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="IsEnabled"
+                            Value="False" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=KeyField}"
+                                           Value="False" />
+                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=TextField}"
+                                           Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="IsEnabled"
+                                    Value="True" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+
+        <Separator/>
+
+        <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Content="Input file"
+                    HorizontalAlignment="Left"
+                    Grid.Column="0"
+                    Margin="15,0,25,0"
+                    VerticalAlignment="Center"
+                    Command="{Binding FileSelectCommand}" />
+
+            <TextBox Grid.Column="1"
+                     VerticalAlignment="Center"
+                     IsReadOnly="True"
+                     x:Name="InputFileField">
+                <TextBox.Text>
+                    <Binding Path="InputFile"
+                             ValidatesOnDataErrors="True"
+                             UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validators:NotEmptyValidator ValidationStep="RawProposedValue"
+                                                          ValidatesOnTargetUpdated="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+
+            <CheckBox Grid.Column="2"
+                      Content="As Hex"
+                      Margin="10, 5"
+                      VerticalAlignment="Center"
+                      IsChecked="{Binding InputFileAsHex, Mode=TwoWay}" />
+        </Grid>
+        <TextBlock Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=InputFileField}"
+                   HorizontalAlignment="Center" />
+
+        <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Output file:    "
+                   HorizontalAlignment="Left"
+                   Grid.Column="0"
+                   Margin="10,0,0,0"
+                   VerticalAlignment="Center" />
+
+            <TextBox Grid.Column="1"
+                     VerticalAlignment="Center"
+                     x:Name="OutputFileField">
+                <TextBox.Text>
+                    <Binding Path="OutputFile"
+                             Mode="OneWayToSource"
+                             ValidatesOnDataErrors="True"
+                             UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <validators:NotEmptyValidator ValidationStep="RawProposedValue" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+
+            <CheckBox Grid.Column="2"
+                      Content="As Hex"
+                      VerticalAlignment="Center"
+                      Margin="10,5"
+                      IsChecked="{Binding OutputFileAsHex, Mode=TwoWay}" />
+
+        </Grid>
+        <TextBlock Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=OutputFileField}"
+                   HorizontalAlignment="Center" />
+
+        <Button Content="Process to file"
+                Width="150"
+                HorizontalAlignment="Left"
+                Command="{Binding ProcessRC4FileCommand}"
+                Margin="15">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="IsEnabled"
+                            Value="False"/>
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=KeyField}"
+                                           Value="False" />
+                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=InputFileField}"
+                                           Value="False" />
+                                <Condition Binding="{Binding Path=(Validation.HasError), ElementName=OutputFileField}"
+                                           Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="IsEnabled"
+                                    Value="True" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+
+        <TextBlock Text="{Binding ErrorMsg}"  Foreground="Red" Margin="15,5"/>
 
     </StackPanel>
 </Page>

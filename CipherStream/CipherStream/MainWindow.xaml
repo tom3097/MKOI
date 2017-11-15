@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CipherStream"
         mc:Ignorable="d"
-        Title="Stream Cipher" Height="400" Width="600">
+        Title="Stream Cipher" Height="570" Width="600">
 
     <Frame x:Name="MainFrame" />
 

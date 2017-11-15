@@ -66,7 +66,7 @@ namespace CipherStream.Models
         {
             if (_key == null || _key.Length != 32)
             {
-                throw new Exception("Key initialization with 256 bits is required before processing.");
+                throw new Exception("Key should have 256 bits.");
             }
             if (nonce.Length != 8)
             {
