@@ -1,17 +1,17 @@
 ﻿<Page x:Class="CipherStream.Views.ChaCha20Page"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:CipherStream.Views"
-      mc:Ignorable="d" 
-      d:DesignHeight="350" d:DesignWidth="600"
+      mc:Ignorable="d"
+      d:DesignHeight="400" d:DesignWidth="600"
       Title="ChaCha20Page"
       Background="White"
       DataContext="{Binding Source={x:Static Application.Current}, Path=AppCipherStreamViewModel}">
 
     <StackPanel>
-        <Label Content="Algorytm RC4"
+        <Label Content="ChaCha20 Algorithm"
                HorizontalAlignment="Center" />
 
         <Grid Margin="0,10">
@@ -21,7 +21,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Content="Key:      "
+            <Label Content="Key:                 "
                    HorizontalAlignment="Left"
                    Grid.Column="0"
                    Margin="10,0,0,0"
@@ -29,14 +29,13 @@
 
             <TextBox Grid.Column="1"
                      VerticalAlignment="Center"
-                     />
+                     Text="{Binding CipherKey, Mode=OneWayToSource}" />
 
-            <StackPanel Grid.Column="2"
-                        Margin="0,0,10,0"
-                        VerticalAlignment="Center">
-                <RadioButton GroupName="InputType" Content="Char" IsChecked="True" />
-                <RadioButton GroupName="InputType" Content="Hex" />
-            </StackPanel>
+            <CheckBox Grid.Column="2"
+                      Content="As Hex"
+                      Margin="10,5"
+                      VerticalAlignment="Center"
+                      IsChecked="{Binding KeyAsHex, Mode=TwoWay}" />
         </Grid>
 
         <Grid Margin="0,10">
@@ -46,7 +45,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Content="Nonce: "
+            <Label Content="Nonce:             "
                    HorizontalAlignment="Left"
                    Grid.Column="0"
                    Margin="10,0,0,0"
@@ -54,14 +53,13 @@
 
             <TextBox Grid.Column="1"
                      VerticalAlignment="Center"
-                     />
+                     Text="{Binding CipherNonce, Mode=OneWayToSource}" />
 
-            <StackPanel Grid.Column="2"
-                        Margin="0,0,10,0"
-                        VerticalAlignment="Center">
-                <RadioButton GroupName="InputType" Content="Char" IsChecked="True" />
-                <RadioButton GroupName="InputType" Content="Hex" />
-            </StackPanel>
+            <CheckBox Grid.Column="2"
+                      Content="As Hex"
+                      Margin="10,5"
+                      VerticalAlignment="Center"
+                      IsChecked="{Binding KeyAsHex, Mode=TwoWay}" />
         </Grid>
 
         <Grid Margin="0,10">
@@ -71,27 +69,28 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Content="Text:     "
+            <Label Content="Text:                "
                    HorizontalAlignment="Left"
                    Grid.Column="0"
                    Margin="10,0,0,0"
-                   VerticalAlignment="Center"  />
+                   VerticalAlignment="Center" />
 
             <TextBox Grid.Column="1"
-                     VerticalAlignment="Center" />
+                     VerticalAlignment="Center"
+                     Text="{Binding CipherMessage, Mode=OneWayToSource}" />
 
-            <StackPanel Grid.Column="2"
-                        Margin="0,0,10,0"
-                        VerticalAlignment="Center">
-                <RadioButton GroupName="InputType" Content="Char" IsChecked="True" />
-                <RadioButton GroupName="InputType" Content="Hex" />
-            </StackPanel>
+            <CheckBox Grid.Column="2"
+                      Content="As Hex"
+                      VerticalAlignment="Center"
+                      Margin="10,5"
+                      IsChecked="{Binding TextAsHex, Mode=TwoWay}" />
         </Grid>
 
         <Grid Margin="0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <Label Content="Bouncy castle: "
@@ -100,31 +99,48 @@
                    Margin="10,0,0,0"
                    VerticalAlignment="Center" />
 
-            <Label Content=""
-                   HorizontalAlignment="Center"
-                   Grid.Column="1"
-                   Margin="10,0,0,0"
-                   VerticalAlignment="Center" />
+            <TextBox Grid.Column="1"
+                     VerticalAlignment="Center"
+                     Text="{Binding BouncyCastleOutput}"
+                     IsReadOnly="True" />
+
+            <CheckBox Grid.Column="2"
+                      Content="As Hex"
+                      VerticalAlignment="Center"
+                      Margin="10,5"
+                      IsChecked="{Binding BouncyCastleOutputAsHex, Mode=TwoWay}" />
         </Grid>
 
         <Grid Margin="0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Label Content="Custom impl.: "
+            <Label Content="Custom impl:  "
                    HorizontalAlignment="Left"
                    Grid.Column="0"
                    Margin="10,0,0,0"
                    VerticalAlignment="Center" />
 
-            <Label Content=""
-                   HorizontalAlignment="Center"
-                   Grid.Column="1"
-                   Margin="10,0,0,0"
-                   VerticalAlignment="Center" />
+            <TextBox Grid.Column="1"
+                     VerticalAlignment="Center"
+                     Text="{Binding BouncyCastleOutput}"
+                     IsReadOnly="True" />
+
+            <CheckBox Grid.Column="2"
+                      Content="As Hex"
+                      Margin="10,5"
+                      VerticalAlignment="Center"
+                      IsChecked="{Binding CustomOutputAsHex, Mode=TwoWay}" />
         </Grid>
+
+        <Button Content="Process ChaCha20"
+                Width="150"
+                HorizontalAlignment="Left"
+                Command="{Binding ProcessRC4Command}"
+                Margin="15" />
 
     </StackPanel>
 </Page>

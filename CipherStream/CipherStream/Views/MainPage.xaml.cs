@@ -16,7 +16,7 @@ namespace CipherStream.Views
         {
             InitializeComponent();
         }
-        
+
         #endregion
     }
 }

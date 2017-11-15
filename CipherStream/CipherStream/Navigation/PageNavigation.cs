@@ -53,7 +53,7 @@ namespace CipherStream.Navigation
                 return navigation.CanGoBack;
             });
         }
-        
+
         #endregion
     }
 }

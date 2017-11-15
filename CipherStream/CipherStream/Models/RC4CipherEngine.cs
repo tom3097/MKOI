@@ -24,7 +24,7 @@ namespace CipherStream.Models
         /// <summary>
         /// The key used for encryption and decryption tasks.
         /// </summary>
-        private byte[] _key; 
+        private byte[] _key;
 
         #endregion
 
