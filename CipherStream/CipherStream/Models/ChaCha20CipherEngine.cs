@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using System.Linq;
+using System.Text;
 
 namespace CipherStream.Models
 {
@@ -33,6 +34,11 @@ namespace CipherStream.Models
         /// </summary>
         private byte[] _key;
 
+        /// <summary>
+        /// Simple logger object saving logs to choosen file.
+        /// </summary>
+        private SimpleLogger _logger;
+
         #endregion
 
         #region methods
@@ -53,6 +59,25 @@ namespace CipherStream.Models
         {
             _key = new byte[key.Length];
             Array.Copy(key, _key, key.Length);
+
+            _logger?.Log("Initialized engine with key: " + BitConverter.ToString(key));
+        }
+
+        /// <summary>
+        /// Enable writing logs to choosen log file.
+        /// </summary>
+        /// <param name="logFile"></param>
+        public void EnableLogging(string logFile)
+        {
+            _logger = new SimpleLogger(logFile);
+        }
+
+        /// <summary>
+        /// Disable logging.
+        /// </summary>
+        public void DisableLogging()
+        {
+            _logger = null;
         }
 
         /// <summary>
@@ -73,6 +98,8 @@ namespace CipherStream.Models
                 throw new ArgumentException("Nonce should have 64 bits.");
             }
 
+            _logger?.Log("Using IV: " + BitConverter.ToString(nonce));
+
             uint totalBlockNumber = (uint)(input.Length % BlockSize == 0 ? input.Length / BlockSize : input.Length / BlockSize + 1);
             byte[] output = new byte[input.Length];
             for (uint blockNumber = 0; blockNumber < totalBlockNumber; ++blockNumber)
@@ -80,6 +107,9 @@ namespace CipherStream.Models
                 // 16 4-bytes integers
                 uint[] initialBlock = GetInitialBlock(_key, nonce, blockNumber);
                 uint[] transformedBlock = GetTransformedBlock(initialBlock);
+
+                _logger?.Log("Block before transformation:" + Environment.NewLine + BlockToString(initialBlock));
+                _logger?.Log("Block after transformation:" + Environment.NewLine + BlockToString(transformedBlock));
 
                 // Add every word from the initial block to the transformed block
                 for (int i = 0; i < initialBlock.Length; ++i)
@@ -89,8 +119,20 @@ namespace CipherStream.Models
 
                 // Serialize the array of integers into little endian array of bytes
                 byte[] keyStream = GetKeyStream(transformedBlock);
-                XorArrays(input, output, keyStream, blockNumber * BlockSize);
+
+                _logger?.Log("Resulting keystream: " + BitConverter.ToString(keyStream));
+
+                uint offset = blockNumber * BlockSize;
+                XorArrays(input, output, keyStream, offset);
+
+                _logger?.Log("Input stream:        " +
+                             BitConverter.ToString(input.Skip((int) offset).Take(keyStream.Length).ToArray()));
+
+                _logger?.Log("Output stream:       " + BitConverter.ToString(output.Skip((int) offset).Take(keyStream.Length).ToArray()));
             }
+
+            _logger?.Log("Finished processing input.");
+            _logger?.Save();
 
             return output;
         }
@@ -227,6 +269,27 @@ namespace CipherStream.Models
         private static uint RotateLeft(uint value, int count)
         {
             return (value << count) | (value >> (32 - count));
+        }
+
+        /// <summary>
+        /// Transform array of integers into its string represantation.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        private string BlockToString(uint[] block)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = 0; i < block.Length; ++i)
+            {
+                if (i != 0 && i % 4 == 0)
+                {
+                    builder.AppendLine();
+                }
+                builder.Append(block[i].ToString("X8"));
+                builder.Append(" ");
+            }
+            return builder.ToString();
         }
 
         #endregion

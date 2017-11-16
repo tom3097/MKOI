@@ -73,6 +73,7 @@
     </ApplicationDefinition>
     <Compile Include="Models\ChaCha20CipherEngine.cs" />
     <Compile Include="Models\RC4CipherEngine.cs" />
+    <Compile Include="Models\SimpleLogger.cs" />
     <Compile Include="Navigation\PageNavigation.cs" />
     <Compile Include="Models\RelayCommand.cs" />
     <Compile Include="Validators\NotEmptyValidator.cs" />

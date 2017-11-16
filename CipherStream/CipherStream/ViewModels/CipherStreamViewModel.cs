@@ -326,6 +326,7 @@ namespace CipherStream.ViewModels
             try
             {
                 var chacha20Engine = new ChaCha20CipherEngine();
+                chacha20Engine.EnableLogging("ChaCha20_log.txt");
                 chacha20Engine.Init(keyByte);
                 byte[] customOutput = chacha20Engine.ProcessBytes(textByte, nonceByte);
 
