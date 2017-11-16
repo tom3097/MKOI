@@ -277,6 +277,7 @@ namespace CipherStream.ViewModels
             try
             {
                 var rc4Engine = new RC4CipherEngine();
+                rc4Engine.EnableLogging("RC4.log");
                 rc4Engine.Init(keyByte);
                 var customOutput = rc4Engine.ProcessBytes(textByte);
 
@@ -326,7 +327,7 @@ namespace CipherStream.ViewModels
             try
             {
                 var chacha20Engine = new ChaCha20CipherEngine();
-                chacha20Engine.EnableLogging("ChaCha20_log.txt");
+                chacha20Engine.EnableLogging("ChaCha20.log");
                 chacha20Engine.Init(keyByte);
                 byte[] customOutput = chacha20Engine.ProcessBytes(textByte, nonceByte);
 
@@ -396,6 +397,7 @@ namespace CipherStream.ViewModels
             try
             {
                 var rc4Engine = new RC4CipherEngine();
+                rc4Engine.EnableLogging("RC4.log");
                 rc4Engine.Init(keyByte);
                 var customOutput = rc4Engine.ProcessBytes(textByte);
 
@@ -461,6 +463,7 @@ namespace CipherStream.ViewModels
             try
             {
                 var chacha20Engine = new ChaCha20CipherEngine();
+                chacha20Engine.EnableLogging("ChaCha20.log");
                 chacha20Engine.Init(keyByte);
                 byte[] customOutput = chacha20Engine.ProcessBytes(textByte, nonceByte);
 

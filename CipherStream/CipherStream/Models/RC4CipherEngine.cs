@@ -26,6 +26,11 @@ namespace CipherStream.Models
         /// </summary>
         private byte[] _key;
 
+        /// <summary>
+        /// Simple logger object saving logs to choosen file.
+        /// </summary>
+        private SimpleLogger _logger;
+
         #endregion
 
         #region methods
@@ -48,6 +53,24 @@ namespace CipherStream.Models
         {
             _key = new byte[key.Length];
             Array.Copy(key, _key, key.Length);
+            _logger?.Log("Initialized engine with key: " + BitConverter.ToString(key));
+        }
+
+        /// <summary>
+        /// Enable writing logs to choosen log file.
+        /// </summary>
+        /// <param name="logFile"></param>
+        public void EnableLogging(string logFile)
+        {
+            _logger = new SimpleLogger(logFile);
+        }
+
+        /// <summary>
+        /// Disable logging.
+        /// </summary>
+        public void DisableLogging()
+        {
+            _logger = null;
         }
 
         /// <summary>
@@ -65,7 +88,13 @@ namespace CipherStream.Models
             for (int i = 0; i < inBytes.Length; ++i)
             {
                 outBytes[i] = (Byte)(inBytes[i] ^ keystream[i]);
+                _logger?.Log("Keystream byte: " + Convert.ToString(keystream[i], 2).PadLeft(8, '0'));
+                _logger?.Log("Input byte:     " + Convert.ToString(inBytes[i], 2).PadLeft(8, '0'));
+                _logger?.Log("Output byte:    " + Convert.ToString(outBytes[i], 2).PadLeft(8 , '0'));
             }
+
+            _logger?.Log("Finished processing input.");
+            _logger?.Save();
 
             return outBytes;
         }
@@ -94,6 +123,8 @@ namespace CipherStream.Models
                 _T[i] = _T[j];
                 _T[j] = temp;
             }
+
+            _logger?.Log("Array T: " + BitConverter.ToString(_T));
         }
 
         /// <summary>
