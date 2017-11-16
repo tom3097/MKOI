@@ -96,7 +96,7 @@ namespace CipherStream.Models
         }
 
         /// <summary>
-        /// @TODO
+        /// Returns 16 four byte words that make up a block of data that is later transformed in method GetTransformedBlock.
         /// </summary>
         /// <param name="key"></param>
         /// <param name="nonce"></param>
@@ -128,7 +128,7 @@ namespace CipherStream.Models
         }
 
         /// <summary>
-        /// @TODO
+        /// Applies 20 rounds of addition xor and shifting on 4 byte integers making up the inputBlock
         /// </summary>
         /// <param name="inputBlock"></param>
         /// <returns></returns>
@@ -156,7 +156,7 @@ namespace CipherStream.Models
         }
 
         /// <summary>
-        /// @TODO
+        /// Produces an array of bytes from an array of integers, making a keystream.
         /// </summary>
         /// <param name="transformedBlock"></param>
         /// <returns></returns>
@@ -174,7 +174,7 @@ namespace CipherStream.Models
         }
 
         /// <summary>
-        /// @TODO
+        /// Apply XOR to every corresponding byte of input and keyStream byte arrays and write results to output array. 
         /// </summary>
         /// <param name="input"></param>
         /// <param name="output"></param>
