@@ -38,7 +38,7 @@ namespace CipherStream.Models
         /// <param name="logMessage"></param>
         public void Log(string logMessage)
         {
-            _log.Append(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] "));
+            _log.Append(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss.fff] "));
             _log.Append(logMessage);
             _log.AppendLine();
         }
@@ -48,7 +48,7 @@ namespace CipherStream.Models
         /// </summary>
         public void Save()
         {
-            File.AppendAllText(_logFile, _log.ToString());
+            File.WriteAllText(_logFile, _log.ToString());
             _log.Clear();
         }
 

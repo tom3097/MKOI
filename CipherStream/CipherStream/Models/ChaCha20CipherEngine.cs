@@ -66,7 +66,7 @@ namespace CipherStream.Models
         /// <summary>
         /// Enable writing logs to choosen log file.
         /// </summary>
-        /// <param name="logFile"></param>
+        /// <param name="logFile">Path to log file.</param>
         public void EnableLogging(string logFile)
         {
             _logger = new SimpleLogger(logFile);
@@ -101,37 +101,38 @@ namespace CipherStream.Models
             _logger?.Log("Using IV: " + BitConverter.ToString(nonce));
 
             uint totalBlockNumber = (uint)(input.Length % BlockSize == 0 ? input.Length / BlockSize : input.Length / BlockSize + 1);
+            _logger?.Log("Number of 64 byte keystream blocks needed: " + totalBlockNumber);
             byte[] output = new byte[input.Length];
             for (uint blockNumber = 0; blockNumber < totalBlockNumber; ++blockNumber)
             {
+                _logger?.Log("Compute keystream block no. " + (blockNumber + 1));
                 // 16 4-bytes integers
                 uint[] initialBlock = GetInitialBlock(_key, nonce, blockNumber);
+                _logger?.Log("Resulting initial block:" + Environment.NewLine + BlockToString(initialBlock));
+
                 uint[] transformedBlock = GetTransformedBlock(initialBlock);
 
-                _logger?.Log("Block before transformation:" + Environment.NewLine + BlockToString(initialBlock));
-                _logger?.Log("Block after transformation:" + Environment.NewLine + BlockToString(transformedBlock));
+                _logger?.Log("Block after 20 rounds:" + Environment.NewLine + BlockToString(transformedBlock));
 
                 // Add every word from the initial block to the transformed block
                 for (int i = 0; i < initialBlock.Length; ++i)
                 {
                     transformedBlock[i] += initialBlock[i];
                 }
+                _logger?.Log("Adding every number from the initial block to the respective number of the transformed block. Result:" +
+                    Environment.NewLine + BlockToString(transformedBlock));
 
                 // Serialize the array of integers into little endian array of bytes
                 byte[] keyStream = GetKeyStream(transformedBlock);
-
-                _logger?.Log("Resulting keystream: " + BitConverter.ToString(keyStream));
+                _logger?.Log("Serializing block of 16 integers into array of bytes, treating integers as if they were saved in LE convention. " +
+                             "Results in array of 64 bytes (keystream) that are later XORed with 64 bytes of input.");
 
                 uint offset = blockNumber * BlockSize;
                 XorArrays(input, output, keyStream, offset);
-
-                _logger?.Log("Input stream:        " +
-                             BitConverter.ToString(input.Skip((int) offset).Take(keyStream.Length).ToArray()));
-
-                _logger?.Log("Output stream:       " + BitConverter.ToString(output.Skip((int) offset).Take(keyStream.Length).ToArray()));
             }
 
-            _logger?.Log("Finished processing input.");
+            _logger?.Log("All blocks of data processed.");
+            _logger?.Log("Ouput: " + BitConverter.ToString(output));
             _logger?.Save();
 
             return output;
@@ -144,25 +145,32 @@ namespace CipherStream.Models
         /// <param name="nonce"></param>
         /// <param name="counter"></param>
         /// <returns></returns>
-        private static uint[] GetInitialBlock(byte[] key, byte[] nonce, ulong counter)
+        private uint[] GetInitialBlock(byte[] key, byte[] nonce, ulong counter)
         {
+            _logger?.Log("Building initial block. At this point it's most conveniant to picture a block as a 4x4 matrix of 32 bit words (unsinged integers).");
             uint[] block = new uint[BlockSize / sizeof(uint)];
             // Words 0-3 are initialised by constants.
+            _logger?.Log(String.Format("Initializing first 4 block integers with magic values: {0}, {1}, {2}, {3}.",
+                Constants[0].ToString("X8"), Constants[1].ToString("X8"), Constants[2].ToString("X8"), Constants[3].ToString("X8")));
             for (int i = 0; i < 4; ++i)
             {
                 block[i] = Constants[i];
             }
 
+
+            _logger?.Log("Initializing integers 5-12 with the key.");
             // Words 4-11 are initialized by the key
             for (uint i = 4; i < 12; ++i)
             {
                 block[i] = GetLittleEndianIntegerFromByteArray(key, (i - 4) * 4);
             }
 
+            _logger?.Log("Initializing integers 13-14 with the block counter. Block counter = " + counter);
             // Words 12-13 are initialised by the block counter
             block[12] = (uint)(counter & 0xFFFFFFFF);
             block[13] = (uint)(counter >> 32);
 
+            _logger?.Log("Initializing integers 15-16 with the IV.");
             // Words 14-15 are initialized by the nonce
             block[14] = GetLittleEndianIntegerFromByteArray(nonce, 0);
             block[15] = GetLittleEndianIntegerFromByteArray(nonce, 4);
@@ -174,9 +182,29 @@ namespace CipherStream.Models
         /// </summary>
         /// <param name="inputBlock"></param>
         /// <returns></returns>
-        private static uint[] GetTransformedBlock(uint[] inputBlock)
+        private uint[] GetTransformedBlock(uint[] inputBlock)
         {
             uint[] returnBlock = inputBlock.ToArray();
+            _logger.Log(
+                @"Transforming block by applying to it 20 rounds of addition, xor and rotation, alternating between column rounds and diagonal rounds. 
+Column round consists of 4 quarter rounds applied respectively to first, second, third and fourth column and diagonal round 
+consists of 4 quarter rounds applied to diagonals starting at first, second, third and fourth block element.
+Quarter round gets as it's input four integers: a, b, c and d and applies to them following operations:
+1.a += b; d ^= a; d <<<= 16; 
+2.c += d; b ^= c; b <<<= 12;
+3.a += b; d ^= a; d <<<= 8;
+4.c += d; b ^= c; b <<<= 7;
+For example, applying quarter round for the third diagonal (integers number 2, 7, 8, 13) for a block:
+ 879531e0  c5ecf37d  516461b1  c9a62f8a
+ 44c20ef3  3390af7f  d9fc690b  2a5f714c
+ 53372767  b00a5631  974c541a  359e9963
+ 5c971061  3d631689  2098d9d6  91dbd320
+results in block (only numbers with * changed):
+ 879531e0  c5ecf37d *bdb886dc  c9a62f8a
+ 44c20ef3  3390af7f  d9fc690b *cfacafd2
+*e46bea80  b00a5631  974c541a  359e9963
+ 5c971061 *ccc07c79  2098d9d6  91dbd320"
+                );
             // Each loop runs two algorithm rounds - one column and one diagonal round.
             for (int round = 0; round < NumberOfRounds; round += 2)
             {
@@ -186,12 +214,14 @@ namespace CipherStream.Models
                     byte[] indexes = { i, (byte)(i + 4), (byte)(i + 8), (byte)(i + 12) };
                     QuarterRound(returnBlock, indexes);
                 }
+                _logger?.Log("Apply column round.");
 
                 // Diagonal round consisting of 4 quarter rounds
                 QuarterRound(returnBlock, new byte[] { 0, 5, 10, 15 });
                 QuarterRound(returnBlock, new byte[] { 1, 6, 11, 12 });
                 QuarterRound(returnBlock, new byte[] { 2, 7, 8, 13 });
                 QuarterRound(returnBlock, new byte[] { 3, 4, 9, 14 });
+                _logger?.Log("Apply diagonal round.");
             }
 
             return returnBlock;
@@ -222,11 +252,13 @@ namespace CipherStream.Models
         /// <param name="output"></param>
         /// <param name="keyStream"></param>
         /// <param name="offset"></param>
-        private static void XorArrays(byte[] input, byte[] output, byte[] keyStream, uint offset)
+        private void XorArrays(byte[] input, byte[] output, byte[] keyStream, uint offset)
         {
             for (int i = 0; i < keyStream.Length && i + offset < input.Length; ++i)
             {
                 output[i + offset] = (byte)(input[i + offset] ^ keyStream[i]);
+                _logger?.Log("XORing keystream with input: " + Convert.ToString(keyStream[i], 2).PadLeft(8, '0') + " XOR " + Convert.ToString(input[i + offset], 2).PadLeft(8, '0')
+                    + " = " + Convert.ToString(output[i + offset], 2).PadLeft(8, '0'));
             }
         }
 
