@@ -120,12 +120,12 @@ namespace CipherStream.Models
                 _T[i] = (byte)i;
             }
 
-            _logger.Log("Initializing temporary variable 'j' with '0' value.");
+            _logger?.Log("Initializing temporary variable 'j' with '0' value.");
             int j = 0;
 
-            _logger.Log("Performing two operations for each 'i' index in 'T' array (0 <= 'i' <= 255).");
-            _logger.Log("Operation 1 - calculating new 'j' value using formula: 'j' = ('j' + 'T[i]' + key['i' % key length]) % 'T' size.");
-            _logger.Log("Operation 2 - swapping 'T[i]' and 'T[j]'.");
+            _logger?.Log("Performing two operations for each 'i' index in 'T' array (0 <= 'i' <= 255).");
+            _logger?.Log("Operation 1 - calculating new 'j' value using formula: 'j' = ('j' + 'T[i]' + key['i' % key length]) % 'T' size.");
+            _logger?.Log("Operation 2 - swapping 'T[i]' and 'T[j]'.");
             for (int i = 0; i < 256; ++i)
             {
                 j = (j + _T[i] + _key[i % _key.Length]) % _TSize;
