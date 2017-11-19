@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Annotations;
 using System.Linq;
 using System.Text;
 
@@ -7,8 +6,8 @@ namespace CipherStream.Models
 {
     /// <summary>
     /// ChaCha20CipherEngine class.
-    /// This class implements a method which allows to perform encryption and decryption
-    /// tasks using ChaCha20 cipher.
+    /// This class implements ChaCha20 cipher. ChaCha20 is a variant of Salsa20 stream cipher.
+    /// ChaCha20CipherEngine provides methods responsible for: initialization, encryption / decryption tasks and managing loger state.
     /// </summary>
     public class ChaCha20CipherEngine
     {
@@ -52,9 +51,9 @@ namespace CipherStream.Models
         }
 
         /// <summary>
-        /// Initializes the engine with the key.
+        /// Initializes the cipher's engine with the given key.
         /// </summary>
-        /// <param name="key">Array of 32 bytes containing the key.</param>
+        /// <param name="key">The 32 bytes key which is to be used as an engine initializer.</param>
         public void Init(byte[] key)
         {
             _key = new byte[key.Length];
@@ -64,16 +63,16 @@ namespace CipherStream.Models
         }
 
         /// <summary>
-        /// Enable writing logs to choosen log file.
+        /// Enables logging to associated log file.
         /// </summary>
-        /// <param name="logFile">Path to log file.</param>
+        /// <param name="logFile">Associated log file.</param>
         public void EnableLogging(string logFile)
         {
             _logger = new SimpleLogger(logFile);
         }
 
         /// <summary>
-        /// Disable logging.
+        /// Disables logging.
         /// </summary>
         public void DisableLogging()
         {
@@ -81,13 +80,12 @@ namespace CipherStream.Models
         }
 
         /// <summary>
-        /// Encrypts or decrypts given bytes using 256 bit key and 64 bit nonce.
+        /// Performs encryption / decryption task on the given input bytes.
         /// </summary>
-        /// <param name="input">Array of bytes to encrypt/decrypt.</param>
+        /// <param name="input">Input bytes which are to be processed.</param>
         /// <param name="nonce">Array of 8 bytes containing the nonce (initialisation vector).</param>
-        /// <returns>Array of decrypted/encrypted bytes of the same length as the input array.</returns>
-        [NotNull]
-        public byte[] ProcessBytes([NotNull] byte[] input, [NotNull] byte[] nonce)
+        /// <returns>Processed output bytes (received after encryption / decryption).</returns>
+        public byte[] ProcessBytes(byte[] input, byte[] nonce)
         {
             if (_key == null || _key.Length != 32)
             {
@@ -126,6 +124,7 @@ namespace CipherStream.Models
                 byte[] keyStream = GetKeyStream(transformedBlock);
                 _logger?.Log("Serializing block of 16 integers into array of bytes, treating integers as if they were saved in LE convention. " +
                              "Results in array of 64 bytes (keystream) that are later XORed with 64 bytes of input.");
+                _logger?.Log("Keystream: " + BitConverter.ToString(keyStream));
 
                 uint offset = blockNumber * BlockSize;
                 XorArrays(input, output, keyStream, offset);
@@ -141,9 +140,9 @@ namespace CipherStream.Models
         /// <summary>
         /// Returns 16 four byte words that make up a block of data that is later transformed in method GetTransformedBlock.
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="nonce"></param>
-        /// <param name="counter"></param>
+        /// <param name="key">Key parameter.</param>
+        /// <param name="nonce">Nonce parameter.</param>
+        /// <param name="counter">Counter parameter.</param>
         /// <returns></returns>
         private uint[] GetInitialBlock(byte[] key, byte[] nonce, ulong counter)
         {
@@ -156,7 +155,6 @@ namespace CipherStream.Models
             {
                 block[i] = Constants[i];
             }
-
 
             _logger?.Log("Initializing integers 5-12 with the key.");
             // Words 4-11 are initialized by the key
@@ -178,9 +176,9 @@ namespace CipherStream.Models
         }
 
         /// <summary>
-        /// Applies 20 rounds of addition xor and shifting on 4 byte integers making up the inputBlock
+        /// Applies 20 rounds of addition xor and shifting on 4 byte integers making up the inputBlock.
         /// </summary>
-        /// <param name="inputBlock"></param>
+        /// <param name="inputBlock">Input block.</param>
         /// <returns></returns>
         private uint[] GetTransformedBlock(uint[] inputBlock)
         {
@@ -230,7 +228,7 @@ results in block (only numbers with * changed):
         /// <summary>
         /// Produces an array of bytes from an array of integers, making a keystream.
         /// </summary>
-        /// <param name="transformedBlock"></param>
+        /// <param name="transformedBlock">Transformed block.</param>
         /// <returns></returns>
         private static byte[] GetKeyStream(uint[] transformedBlock)
         {
@@ -246,26 +244,26 @@ results in block (only numbers with * changed):
         }
 
         /// <summary>
-        /// Apply XOR to every corresponding byte of input and keyStream byte arrays and write results to output array. 
+        /// Apply XOR to every corresponding byte of input and keyStream byte arrays and write results to output array.
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="output"></param>
-        /// <param name="keyStream"></param>
-        /// <param name="offset"></param>
+        /// <param name="input">Input.</param>
+        /// <param name="output">Output.</param>
+        /// <param name="keyStream">Keystream.</param>
+        /// <param name="offset">Offset.</param>
         private void XorArrays(byte[] input, byte[] output, byte[] keyStream, uint offset)
         {
             for (int i = 0; i < keyStream.Length && i + offset < input.Length; ++i)
             {
                 output[i + offset] = (byte)(input[i + offset] ^ keyStream[i]);
-                _logger?.Log("XORing keystream with input: " + Convert.ToString(keyStream[i], 2).PadLeft(8, '0') + " XOR " + Convert.ToString(input[i + offset], 2).PadLeft(8, '0')
-                    + " = " + Convert.ToString(output[i + offset], 2).PadLeft(8, '0'));
+                _logger?.Log("XORing keystream with input: " + Convert.ToString(keyStream[i], 2).PadLeft(8, '0') + " XOR " +
+                    Convert.ToString(input[i + offset], 2).PadLeft(8, '0') + " = " + Convert.ToString(output[i + offset], 2).PadLeft(8, '0'));
             }
         }
 
         /// <summary>
         /// Basic operation of the ChaCha algorithm. It manipulates 4 choosen integers from given block.
         /// </summary>
-        /// <param name="indexes">Array of 4 indexes of the integers to be changed</param>
+        /// <param name="indexes">Array of 4 indexes of the integers to be changed.</param>
         private static void QuarterRound(uint[] block, byte[] indexes)
         {
             uint a = block[indexes[0]];
@@ -306,8 +304,8 @@ results in block (only numbers with * changed):
         /// <summary>
         /// Transform array of integers into its string represantation.
         /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
+        /// <param name="block">Block which is to be transformed to string.</param>
+        /// <returns>Created string representing given block.</returns>
         private string BlockToString(uint[] block)
         {
             StringBuilder builder = new StringBuilder();

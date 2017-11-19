@@ -10,6 +10,8 @@ namespace CipherStream.Validators
     /// </summary>
     class NotEmptyValidator : ValidationRule
     {
+        #region methods
+
         /// <summary>
         /// Validate 'value' value.
         /// </summary>
@@ -26,5 +28,7 @@ namespace CipherStream.Validators
 
             return ValidationResult.ValidResult;
         }
+
+        #endregion
     }
 }

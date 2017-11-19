@@ -25,7 +25,7 @@ namespace CipherStream.Models
         /// <summary>
         /// Creates SimpleLogger object with associated log file.
         /// </summary>
-        /// <param name="logFile"></param>
+        /// <param name="logFile">Associated log file.</param>
         public SimpleLogger(string logFile)
         {
             _logFile = logFile;
@@ -35,11 +35,10 @@ namespace CipherStream.Models
         /// <summary>
         /// Append log message to log buffer.
         /// </summary>
-        /// <param name="logMessage"></param>
+        /// <param name="logMessage">Log message which is to be appended.</param>
         public void Log(string logMessage)
         {
-            _log.Append(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss.fff] "));
-            _log.Append(logMessage);
+            _log.Append(String.Format("{0} {1}", DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] "), logMessage));
             _log.AppendLine();
         }
 
