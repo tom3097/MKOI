@@ -183,7 +183,7 @@ namespace CipherStream.Models
         private uint[] GetTransformedBlock(uint[] inputBlock)
         {
             uint[] returnBlock = inputBlock.ToArray();
-            _logger.Log(
+            _logger?.Log(
                 @"Transforming block by applying to it 20 rounds of addition, xor and rotation, alternating between column rounds and diagonal rounds. 
 Column round consists of 4 quarter rounds applied respectively to first, second, third and fourth column and diagonal round 
 consists of 4 quarter rounds applied to diagonals starting at first, second, third and fourth block element.
